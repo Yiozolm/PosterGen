@@ -9,7 +9,6 @@ import json_repair
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic  
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.chat_models import ChatZhipuAI
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_community.callbacks.manager import get_openai_callback
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -77,13 +76,12 @@ def create_model(config: ModelConfig):
             'api_key': os.getenv('ZHIPU_API_KEY'),
             'timeout': timeout_settings['request_timeout'],
             'max_retries': timeout_settings['max_retries'],
-            'thinking': {"type": "disabled"}  
         }
         base_url = os.getenv('ZHIPU_BASE_URL')
         if base_url:
             zhipu_kwargs['base_url'] = base_url
             
-        return ChatZhipuAI(**zhipu_kwargs)
+        return ChatOpenAI(**zhipu_kwargs)
     else:
         raise ValueError(f"unsupported provider: {config.provider}")
 
@@ -123,7 +121,7 @@ class LangGraphAgent:
         # get response with token tracking
         input_tokens, output_tokens = 0, 0
         try:
-            if self.config.provider == 'openai':
+            if self.config.provider in ('openai', 'zhipu'):
                 with get_openai_callback() as cb:
                     response = self.model.invoke(self.history)
                     input_tokens = cb.prompt_tokens or 0
@@ -178,7 +176,7 @@ class LangGraphAgent:
         # get response
         input_tokens, output_tokens = 0, 0
         try:
-            if self.config.provider == 'openai':
+            if self.config.provider in ('openai', 'zhipu'):
                 with get_openai_callback() as cb:
                     response = self.model.invoke([self.history[0], human_msg])
                     input_tokens = cb.prompt_tokens or 0
