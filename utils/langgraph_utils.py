@@ -96,6 +96,20 @@ def create_model(config: ModelConfig):
             moonshot_kwargs['base_url'] = base_url
             
         return ChatOpenAI(**moonshot_kwargs)
+    elif config.provider == 'Minimax':
+        minimax_kwargs = {
+            'model': config.model_name,
+            'temperature': config.temperature,
+            'max_tokens': config.max_tokens,
+            'api_key': os.getenv('MINIMAX_API_KEY'),
+            'timeout': timeout_settings['request_timeout'],
+            'max_retries': timeout_settings['max_retries'],
+        }
+        base_url = os.getenv('MINIMAX_BASE_URL')
+        if base_url:
+            minimax_kwargs['base_url'] = base_url
+            
+        return ChatOpenAI(**minimax_kwargs)
     else:
         raise ValueError(f"unsupported provider: {config.provider}")
 
