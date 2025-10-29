@@ -132,5 +132,7 @@ def _get_model_config(model_id: str) -> ModelConfig:
         "kimi-k2-turbo-preview": ModelConfig("kimi-k2-turbo-preview", "moonshot"),
         "moonshot-v1-8k-vision-preview": ModelConfig("moonshot-v1-8k-vision-preview", "moonshot"),
         "MiniMax-M2": ModelConfig("MiniMax-M2", "Minimax"),
+        "qwen3-max": ModelConfig("qwen3-max", "Alibaba"),
+        "qwen3-vl-plus": ModelConfig("qwen3-vl-plus", "Alibaba"),
     }
     return configs.get(model_id, configs["gpt-4.1-2025-04-14"])
